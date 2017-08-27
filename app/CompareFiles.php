@@ -1,5 +1,7 @@
 <?php
 
+namespace App;
+
 /**
  * Description of CompareFiles
  *
@@ -10,21 +12,15 @@ class CompareFiles {
     private $filesPath;
     private $phrases;
     private $punctuation = array(".", "?", "!", ":", ";");
+    private $client;
 
-    public function __construct($filePaths) {
-        if (!is_array($filePaths) || !count($filePaths) === 2) {
-            throw new Exception("invalid arguments: two paths are needed");
-        }
-        if (!file_exists($filePaths[0])) {
-            throw new Exception("File " . basename($filePaths[0]) . " doesn't exist at " . $filePaths[0]);
-        }
-        if (!file_exists($filePaths[1])) {
-            throw new Exception("File " . basename($filePaths[1]) . " doesn't exist at " . $filePaths[1]);
-        }
+    public function __construct($filePaths, $client = null) {
+        
+        $this->client = $client;
         $this->filesPath = $filePaths;
         $this->filesPath = $this->setSmallestFileFirst();
         $this->readFile(0);
-       // $this->readFile(1);
+        $this->readFile(1);
     }
 
     /**
@@ -35,16 +31,23 @@ class CompareFiles {
         return filesize($this->filesPath[0]) > filesize($this->filesPath[1]) ? array_reverse($this->filesPath) : $this->filesPath;
     }
 
+    /**
+     * read and compare phrases in files, and send it to output
+     * @param int $position the position in $filesPath
+     * @throws Exception if the file cannot be read
+     */
     protected function readFile($position) {
 
         $lastChunkResidue = '';
-        
+         $pool = [];
+
         if ($handle = fopen($this->filesPath[$position], 'rb')) {
             while (!feof($handle)) {
 
                 $buffer = $lastChunkResidue . fread($handle, 8192);
                 $strlen = strlen($buffer);
                 $index = 0;
+               
 
                 for ($i = 0; $i < $strlen; $i++) {
                     if (in_array($buffer{$i}, $this->punctuation)) {
@@ -61,6 +64,11 @@ class CompareFiles {
                         }
                         if (isset($this->phrases[$hash]) && $this->phrases[$hash] === $plen) {
                             echo $p . PHP_EOL;
+                            $pool[] = $p;
+                            if (!is_null($this->client) && count($pool) === 100) {
+                                $this->client->send(json_encode($pool));
+                                $pool = [];
+                            }
                             unset($this->phrases[$hash]);
                         }
                     }
@@ -70,8 +78,13 @@ class CompareFiles {
                     $lastChunkResidue = str_replace(PHP_EOL, '', substr($buffer, $index, $strlen - 1 - $index));
                 }
             }
+
+            if (!is_null($this->client) && count($pool) === 100) {
+                $this->client->send(json_encode($pool));
+                $pool = [];
+            }
         } else {
-            throw new Exception("File " . basename($this->filesPath[0]) . "cannot be read");
+            throw new Exception("File " . basename($this->filesPath[$position]) . "cannot be read");
         }
     }
 

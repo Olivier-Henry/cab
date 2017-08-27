@@ -1,0 +1,11 @@
+{
+    "autoload": {
+        "psr-0": {
+            "App": "./"
+        }
+    },
+    "require": {
+        "cboden/ratchet": "^0.3.6",
+        "symfony/process": "^3.3"
+    }
+}

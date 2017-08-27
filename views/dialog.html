@@ -1,24 +1,27 @@
 <md-dialog aria-label="Mango (Fruit)">
     <md-toolbar>
-      <div class="md-toolbar-tools">
-        <h2>Identical phrases</h2>
-        <span flex></span>
-      </div>
+        <div class="md-toolbar-tools">
+            <h2>Identical phrases</h2>
+            <span flex></span>
+        </div>
     </md-toolbar>
 
     <md-dialog-content>
-      <div class="md-dialog-content" ng-bind="identicalPhrases">
-      </div>
+        <div  class="md-dialog-content">
+            <p ng-repeat="phrase in identicalPhrases track by $index" ng-bind="phrase">
+            </p>
+
+            <div layout="row" layout-sm="column" layout-align="space-around" ng-show="!identicalPhrases.length">
+                <md-progress-circular md-mode="indeterminate"></md-progress-circular>
+            </div>
+        </div>
     </md-dialog-content>
 
     <md-dialog-actions layout="row">
-      <span flex></span>
-      <md-button ng-click="answer('not useful')">
-       Not Useful
-      </md-button>
-      <md-button ng-click="answer('useful')">
-        Useful
-      </md-button>
+        <span flex></span>
+        <md-button ng-click="answer('useful')">
+            Close
+        </md-button>
     </md-dialog-actions>
-  </form>
+</form>
 </md-dialog>

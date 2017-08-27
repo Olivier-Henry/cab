@@ -24,11 +24,7 @@ class GenerateFixtures {
         $this->filePaths = $filePaths;
         $this->generatedPhrases = [];
         $this->fileSize = $fileSize;
-
-        
-        
-
-         $this->process();
+        $this->process();
     }
 
     private function process() {
@@ -63,9 +59,6 @@ class GenerateFixtures {
                 $phrasestoAppend .= $p;
             }
             
-
-//            echo mb_detect_encoding($phrasestoAppend);
-//            file_put_contents($this->filePaths[$position],  $phrasestoAppend . PHP_EOL    , FILE_APPEND | LOCK_EX);
             fwrite($f, $phrasestoAppend . PHP_EOL);
         }
 
@@ -123,11 +116,8 @@ class GenerateFixtures {
         return substr($this->letters, mt_rand(0, strlen($this->letters)), 1);
     }
 
-    private function addDuplicatePhrase() {
-        
-    }
 
 }
 
-new GenerateFixtures(4000000000, array('C:\wamp\www\clickandboat\cap\text1.txt', 'C:\wamp\www\clickandboat\cap\text2.txt'));
+new GenerateFixtures(400000, array('C:\xampp\htdocs\clickandboat\text1.txt', 'C:\xampp\htdocs\clickandboat\text2.txt'));
 

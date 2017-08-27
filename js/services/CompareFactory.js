@@ -3,7 +3,7 @@ app.factory('CompareFactory', function ($http) {
 
     return {
         get: function (paths) {
-            return $http.post('compare.php', paths)
+            return $http.post('index.php', paths)
                     .then(
                             function (data) {
                                 return data.data;
