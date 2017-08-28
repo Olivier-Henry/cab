@@ -98,7 +98,7 @@ class CompareFiles {
                 }
             }
         } else {
-            throw new Exception("File " . basename($this->filesPath[$position]) . "cannot be read");
+            throw new \Exception("File " . basename($this->filesPath[$position]) . "cannot be read");
         }
     }
 
