@@ -39,9 +39,14 @@ class CompareFiles {
     protected function readFile($position) {
 
         $lastChunkResidue = '';
-         $pool = [];
+        $pool = [];
+       
 
         if ($handle = fopen($this->filesPath[$position], 'rb')) {
+            
+             $found = false;
+             
+             
             while (!feof($handle)) {
 
                 $buffer = $lastChunkResidue . fread($handle, 8192);
@@ -65,6 +70,7 @@ class CompareFiles {
                         if (isset($this->phrases[$hash]) && $this->phrases[$hash] === $plen) {
                             echo $p . PHP_EOL;
                             $pool[] = $p;
+                            $found = true;
                             if (!is_null($this->client) && count($pool) === 100) {
                                 $this->client->send(json_encode($pool));
                                 $pool = [];
@@ -79,9 +85,17 @@ class CompareFiles {
                 }
             }
 
-            if (!is_null($this->client) && count($pool) === 100) {
+            if (!is_null($this->client) && count($pool)) {
                 $this->client->send(json_encode($pool));
                 $pool = [];
+            }
+            
+            if($found === false && $position > 0){
+                echo "No duplicate phrase was found";
+                
+                if(!is_null($this->client)){
+                    $this->client->send(json_encode(["No duplicate phrase was found"]));
+                }
             }
         } else {
             throw new Exception("File " . basename($this->filesPath[$position]) . "cannot be read");

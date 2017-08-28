@@ -119,5 +119,5 @@ class GenerateFixtures {
 
 }
 
-new GenerateFixtures(400000, array('C:\xampp\htdocs\clickandboat\text1.txt', 'C:\xampp\htdocs\clickandboat\text2.txt'));
+new GenerateFixtures(400000, array('/Library/Server/Web/Data/Sites/Default/cab/text1.txt', '/Library/Server/Web/Data/Sites/Default/cab/text2.txt'));
 

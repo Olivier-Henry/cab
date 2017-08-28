@@ -7,17 +7,20 @@ use App\Server;
 
 require __DIR__ . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
 
-if (!is_array($argv) || !count($argv) === 3) {
+
+array_shift($argv);
+
+if (!is_array($argv) || !count($argv) === 2) {
     throw new Exception("invalid arguments: two paths are needed");
 }
 if (!file_exists($argv[0])) {
-    throw new Exception("File " . basename($argv[1]) . " doesn't exist at " . $argv[1]);
+    throw new Exception("File " . basename($argv[0]) . " doesn't exist at " . $argv[0]);
 }
 if (!file_exists($argv[1])) {
-    throw new Exception("File " . basename($argv[2]) . " doesn't exist at " . $argv[2]);
+    throw new Exception("File " . basename($argv[1]) . " doesn't exist at " . $argv[1]);
 }
 
-array_shift($argv);
+
 
 $server = IoServer::factory(
                 new HttpServer(
