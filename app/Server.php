@@ -8,11 +8,13 @@ use Ratchet\ConnectionInterface;
 class Server implements MessageComponentInterface {
     
     protected $clients;
-    private $paths;
+    protected $paths;
+    protected $callback;
 
-    public function __construct($paths) {
+    public function __construct($paths, $callback) {
         $this->clients = new \SplObjectStorage;
         $this->paths = $paths;
+        $this->callback = $callback;
     }
 
     public function onOpen(ConnectionInterface $conn) {
@@ -36,13 +38,17 @@ class Server implements MessageComponentInterface {
         // The connection is closed, remove it, as we can no longer send it messages
         $this->clients->detach($conn);
         $conn->close();
-        die();
+        $this->close();
         echo "Connection {$conn->resourceId} has been disconnected and closed\n";
     }
 
     public function onError(ConnectionInterface $conn, \Exception $e) {
         echo "An error has occurred: {$e->getMessage()}\n";
-
         $conn->close();
+        $this->close();
+    }
+    
+    protected function close(){
+         call_user_func($this->callback);
     }
 }
