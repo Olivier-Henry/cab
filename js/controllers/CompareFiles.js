@@ -61,8 +61,6 @@ app.controller('CompareFiles', function ($scope, CompareFactory, $mdDialog) {
                 };
 
             }, 2000);
-        } else {
-            $scope.ws.send("find duplicates");
         }
     };
 

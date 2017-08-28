@@ -29,19 +29,11 @@
                     <div  layout="column">
                         <md-input-container>
                             <label>Path of first file</label>
-                            <input name="fpath" ng-model="fpath" required  minlength="2">
-                            <div ng-messages="compareForm.fpath.$error" ng-show="compareForm.fpath.$dirty">
-                                <div ng-message="required">This is required!</div>
-                                <div ng-message="minlength">That's too short!</div>
-                            </div>
+                            <input name="fpath" ng-model="fpath" required>
                         </md-input-container>
                         <md-input-container>
                             <label>Path of secondary file</label>
-                            <input name="spath" ng-model="spath" required minlength="2">
-                            <div ng-messages="compareForm.spath.$error" ng-show="compareForm.spath.$dirty">
-                                <div ng-message="required">This is required!</div>
-                                <div ng-message="minlength">That's too short!</div>
-                            </div>
+                            <input name="spath" ng-model="spath" required >
                         </md-input-container>
                         <md-button class="md-raised md-accent" ng-click="findDuplicatePhrases()">Find duplicate phrases</md-button>
                     </div>

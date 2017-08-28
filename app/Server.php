@@ -26,15 +26,21 @@ class Server implements MessageComponentInterface {
     }
 
     public function onMessage(ConnectionInterface $from, $msg) {
-
+        
         $numRecv = count($this->clients) - 1;
         echo sprintf('Connection %d sending message "%s" to %d other connection%s' . "\n"
                 , $from->resourceId, $msg, $numRecv, $numRecv == 1 ? '' : 's');
-
+        
         foreach ($this->clients as $client) {
-            if( $this->analysePaths(json_decode($msg, true), $client)) {
-                $this->paths =json_decode($msg, true);
+            try {
+                if (is_array(json_decode($msg, true))) {
+                    $this->paths = $this->analysePaths(json_decode($msg, true));
+                }
                 new CompareFiles($this->paths, $client);
+            } catch (\Exception $exc) {
+                file_put_contents("/Library/Server/Web/Data/Sites/Default/cab/test.log", $exc);
+                $client->send(json_encode([$exc->getMessage()]));
+                break;
             }
         }
     }
@@ -57,19 +63,19 @@ class Server implements MessageComponentInterface {
         call_user_func($this->callback);
     }
 
-    protected function analysePaths($paths, $client) {
+    protected function analysePaths($paths) {
 
         if (!is_array($paths) || !count($paths) === 2) {
-            $client->send(["invalid arguments: two paths are needed"]);
+            throw new \Exception("invalid arguments: two paths are needed");
         }
         if (!file_exists($paths[0])) {
-            $client->send(["File " . basename($paths[0]) . " doesn't exist at " . $paths[0]]);
+            throw new \Exception("File " . basename($paths[0]) . " doesn't exist at " . $paths[0]);
         }
         if (!file_exists($paths[1])) {
-            $client->send(["File " . basename($paths[1]) . " doesn't exist at " . $paths[1]]);
+            throw new \Exception("File " . basename($paths[1]) . " doesn't exist at " . $paths[1]);
         }
-
-        return true;
+        
+        return $paths;
     }
 
 }
