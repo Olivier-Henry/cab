@@ -22,10 +22,15 @@ array_shift($argv);
 $server = IoServer::factory(
                 new HttpServer(
                     new WsServer(
-                        new Server($argv)
+                        new Server($argv, 'stopCallback')
                     )
                 ), 3030
 );
 
 $server->run();
+
+// when loop completed, run this function
+function stopCallback() {
+    $server->loop->stop();
+}
 
