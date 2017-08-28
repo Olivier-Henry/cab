@@ -9,7 +9,7 @@ app.factory('CompareFactory', function ($http) {
                                 return data.data;
                             },
                             function (error) {
-                                console.log(error);
+                              // console.log(error);
                             }
                     );
         }

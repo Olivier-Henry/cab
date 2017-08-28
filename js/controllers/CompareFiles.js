@@ -5,12 +5,12 @@ app.controller('CompareFiles', function ($scope, CompareFactory, $mdDialog) {
     $scope.fpath = 'C:\\xampp\\htdocs\\clickandboat\\text2.txt';
 
     $scope.identicalPhrases = [];
+    $scope.socketInitialised = false;
 
 
     $scope.findDuplicatePhrases = function (ev) {
 
-
-
+        $scope.identicalPhrases = [];
 
         $mdDialog.show({
 
@@ -19,43 +19,48 @@ app.controller('CompareFiles', function ($scope, CompareFactory, $mdDialog) {
             targetEvent: ev,
             clickOutsideToClose: false,
             fullscreen: $scope.customFullscreen, // Only for -xs, -sm breakpoints.
-            scope: $scope
+            scope: $scope,
+            preserveScope: true
         })
-                .then(function (answer) {
-                    $scope.status = 'You said the information was "' + answer + '".';
-                }, function () {
-                    $scope.status = 'You cancelled the dialog.';
+                .then(function () {
+                    console.log('dialog closed');
                 });
 
         CompareFactory.get([$scope.spath, $scope.fpath])
                 .then(function (response) {
 
-                    $scope.identicalPhrases = response;
                 });
 
+        if (!$scope.socketInitialised) {
+            setTimeout(function () {
 
-        setTimeout(function () {
+                $scope.socketInitialised = true;
+                $scope.ws = new WebSocket("ws://localhost:3030");
+                $scope.ws.onopen = function (event) {
+                    $scope.ws.send("find duplicates");
+                };
 
-            var ws = new WebSocket("ws://localhost:3030");
-            ws.onopen = function (event) {
-                console.info('open');
-                ws.send("hello");
-            };
+                $scope.ws.onclose = function (event) {
+                    console.info('close');
+                };
 
-            ws.onclose = function (event) {
-                console.info('close');
-            };
+                $scope.ws.onerror = function (event) {
+                    console.info('error');
+                };
 
-            ws.onerror = function (event) {
-                console.info('error');
-            };
-
-            ws.onmessage = function (event) {
+                $scope.ws.onmessage = function (event) {
                     $scope.identicalPhrases = $scope.identicalPhrases.concat(JSON.parse(event.data));
                     $scope.$apply();
-            };
+                };
 
-        }, 2000);
+            }, 2000);
+        } else {
+            $scope.ws.send("find duplicates");
+        }
+    };
+
+    $scope.close = function () {
+        $mdDialog.hide();
     };
 });
 
